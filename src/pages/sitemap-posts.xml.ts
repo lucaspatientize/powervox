@@ -1,11 +1,14 @@
 import type { APIRoute } from "astro";
 import { getEmDashCollection } from "emdash";
 
+// WordPress's default "Hello world!" post came over with the import.
+const EXCLUDED_SLUGS = new Set(["hello-world"]);
+
 export const GET: APIRoute = async ({ site }) => {
   const baseUrl = site?.origin || "https://powervox.com.br";
   const { entries: posts } = await getEmDashCollection("posts", { status: "published" });
 
-  const urls = (posts || []).map((post: any) => `
+  const urls = (posts || []).filter((post: any) => !EXCLUDED_SLUGS.has(post.slug)).map((post: any) => `
   <url>
     <loc>${baseUrl}/${post.slug}/</loc>
     <changefreq>monthly</changefreq>

@@ -22,13 +22,16 @@ const imageUrl = product.data?.featured_image?.meta?.storageKey
 const { entries: allMidbass } = await getEmDashCollection("midbass", { status: "published" });
 const { entries: allSubwoofers } = await getEmDashCollection("subwoofer", { status: "published" });
 
+/* Entries carry no collection name, so tag each with its URL prefix here */
 const relatedProducts = [
-  ...(allMidbass || []).filter((p: any) => p.slug !== slug),
-  ...(allSubwoofers || []),
-].slice(0, 12).map((p: any) => ({
+  ...(allMidbass || [])
+    .filter((p: any) => p.slug !== slug)
+    .map((p: any) => ({ p, basePath: "/produtos/mid-bass" })),
+  ...(allSubwoofers || []).map((p: any) => ({ p, basePath: "/produtos/subwoofer" })),
+].slice(0, 12).map(({ p, basePath }: { p: any; basePath: string }) => ({
   title: p.data?.title || "",
   slug: p.slug,
-  basePath: `/produtos/${p.collection === "subwoofer" ? "subwoofer" : "mid-bass"}`,
+  basePath,
   image: p.data?.featured_image?.meta?.storageKey
     ? `${EMDASH_BASE}/_emdash/api/media/file/${p.data.featured_image.meta.storageKey}`
     : p.data?.thumbnail_url || "",
