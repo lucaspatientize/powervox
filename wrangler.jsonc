@@ -3,6 +3,9 @@
   "account_id": "0e2b4b12004b037accd19771e488007d",
   "compatibility_date": "2024-12-01",
   "compatibility_flags": ["nodejs_compat"],
+  // Previews bind the production D1, so a preview of a branch with schema
+  // changes would migrate the live database. Keep them off.
+  "preview_urls": false,
   "d1_databases": [
     {
       "binding": "DB",
