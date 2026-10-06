@@ -51,15 +51,29 @@ emdash({
 - Account ID: `0e2b4b12004b037accd19771e488007d`
 
 ## Deploy
-```bash
-npm run build && npx wrangler deploy
-```
-Live at: https://powervox.mountainpeakmarketing.workers.dev
+GitHub `lucaspatientize/powervox` is the source of truth; Cloudflare Workers Builds deploys it.
+- Push/merge to `main` → `npm run build` + `npm run deploy` → production.
+- Any other branch → `npm run build` + `npx wrangler versions upload` (uploaded, not deployed).
+- Do NOT `wrangler deploy` from a laptop: it bypasses GitHub and the two drift apart (the live site ran
+  un-versioned laptop builds until 2026-10-06).
+- Preview URLs are disabled (`preview_urls: false`): previews bind the production D1 and EmDash migrates
+  on first request, so a preview of an upgrade branch would migrate the live database.
+- EmDash upgrades run D1 migrations on the first request after deploy. Export first:
+  `npx wrangler d1 export powervox-db --remote --output backups/<name>.sql` (`backups/` is gitignored)
+  and note the bookmark from `npx wrangler d1 time-travel info powervox-db`.
+- Node: `.node-version` pins Workers Builds; EmDash 1.1.0 needs Node >= 22.16.
+
+Live at: https://powervox.com.br (also https://powervox.mountainpeakmarketing.workers.dev)
 
 ## EmDash Content Structure
 - **Collections**: posts, pages, midbass, subwoofer
 - **Taxonomy**: polegadas (speaker sizes: 8", 10", 12", 15", 18", 21")
-- **Admin sidebar patch**: `patches/@emdash-cms+admin+0.1.1.patch` adds Polegadas to sidebar nav (via `patch-package`)
+- **Email**: official `cloudflareEmail()` plugin (`@emdash-cms/cloudflare/plugins`) over the `EMAIL` send_email binding,
+  sender `noreply@cms.powervox.com.br`. Email links use the stored `emdash:site_url` (https://powervox.com.br).
+- **Users**: invites link to `/_emdash/admin/invite/accept` (passkey registration, EmDash >= 1.x). Magic links only
+  reach existing users. Passkeys are bound to the domain they were created on.
+- **Sitemap**: `/sitemap.xml` and `/robots.txt` are overridden in `src/pages/` (project routes beat EmDash's injected ones);
+  EmDash's built-in sitemap only knows collection URL patterns like `/midbass/{slug}`.
 
 ## EmDash API Patterns
 - Media URLs: `/_emdash/api/media/file/{storageKey}`
