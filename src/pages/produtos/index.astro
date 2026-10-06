@@ -1,0 +1,214 @@
+---
+/**
+ * Products index — https://powervox.com.br/produtos/
+ */
+import Base from "@/layouts/Base.astro";
+import { getEmDashCollection } from "@/utils/emdash";
+
+const EMDASH_BASE = "";
+const { entries: midbass } = await getEmDashCollection("midbass", { status: "published" });
+const { entries: subwoofers } = await getEmDashCollection("subwoofer", { status: "published" });
+
+function getImage(p: any) {
+  if (p.data?.featured_image?.meta?.storageKey)
+    return `${EMDASH_BASE}/_emdash/api/media/file/${p.data.featured_image.meta.storageKey}`;
+  return "";
+}
+---
+
+<Base title="Produtos">
+  <!-- Hero Bar -->
+  <section class="hero-bar">
+    <div class="container">
+      <h1>Produtos</h1>
+      <p class="hero-desc">Explore a excelência sonora da Powervox. Nossa linha de produtos automotivos e profissionais combina potência, durabilidade e design inovador, proporcionando uma experiência auditiva de alta fidelidade. Descubra soluções desenvolvidas para atender às mais exigentes necessidades do mercado de áudio.</p>
+    </div>
+  </section>
+
+  <!-- Tabbed Product Grid -->
+  <section class="products-section">
+    <div class="container">
+      <div class="tabs">
+        <input type="radio" name="product-tab" id="tab-midbass" checked />
+        <input type="radio" name="product-tab" id="tab-subwoofers" />
+        <div class="tab-titles">
+          <label for="tab-midbass" class="tab-title">Mid-Bass</label>
+          <label for="tab-subwoofers" class="tab-title">Subwoofers</label>
+        </div>
+
+        <div class="tab-pane" id="pane-midbass">
+          <div class="product-grid">
+            {(midbass || []).map((p: any) => (
+              <div class="product-card">
+                <a href={`/produtos/mid-bass/${p.slug}/`} class="card-image-link">
+                  {getImage(p) && <img src={getImage(p)} alt={p.data?.title} loading="lazy" />}
+                </a>
+                <h3>{p.data?.title}</h3>
+                <a href={`/produtos/mid-bass/${p.slug}/`} class="view-link">View Product <span class="arrow">&rarr;</span></a>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div class="tab-pane" id="pane-subwoofers">
+          <div class="product-grid">
+            {(subwoofers || []).map((p: any) => (
+              <div class="product-card">
+                <a href={`/produtos/subwoofer/${p.slug}/`} class="card-image-link">
+                  {getImage(p) && <img src={getImage(p)} alt={p.data?.title} loading="lazy" />}
+                </a>
+                <h3>{p.data?.title}</h3>
+                <a href={`/produtos/subwoofer/${p.slug}/`} class="view-link">View Product <span class="arrow">&rarr;</span></a>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  /* Hero Bar */
+  .hero-bar {
+    background: url("/_emdash/api/media/file/01KNX7CA9NFECY91VSHC4FBRGV.jpeg") no-repeat center center;
+    background-attachment: fixed;
+    background-size: cover;
+    border-bottom: 2px solid #262626;
+    padding: 60px 0;
+  }
+  .hero-bar h1 {
+    color: #fff;
+    font-size: 2.5rem;
+    margin-bottom: 15px;
+  }
+  .hero-desc {
+    color: #fff;
+    font-size: 20px;
+    max-width: 800px;
+    line-height: 1.6;
+  }
+
+  /* Tabs — pure CSS with hidden radio inputs */
+  .tabs {
+    padding: 40px 0;
+  }
+  .tabs input[type="radio"] {
+    display: none;
+  }
+  .tab-titles {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+  }
+  .tab-title {
+    font-size: 20px;
+    font-weight: 300;
+    text-transform: uppercase;
+    padding: 15px 35px;
+    cursor: pointer;
+    background: transparent;
+    color: #F5F5F5;
+    border: 1px solid #F5F5F5;
+    transition: all 0.2s ease;
+  }
+
+  /* Active tab styles */
+  #tab-midbass:checked ~ .tab-titles label[for="tab-midbass"],
+  #tab-subwoofers:checked ~ .tab-titles label[for="tab-subwoofers"] {
+    background: #fff;
+    color: #212121;
+    font-weight: 800;
+    border-color: #fff;
+  }
+
+  /* Tab pane visibility */
+  .tab-pane {
+    display: none;
+  }
+  #tab-midbass:checked ~ #pane-midbass,
+  #tab-subwoofers:checked ~ #pane-subwoofers {
+    display: block;
+  }
+
+  /* Product Grid */
+  .product-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+  }
+
+  /* Product Card */
+  .product-card {
+    background: #191919;
+    padding: 25px;
+    border: 1px solid #454545;
+    border-radius: 5px;
+    text-align: center;
+    transition: border-color 0.3s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .product-card:hover {
+    border-color: #F1D68F;
+  }
+  .card-image-link {
+    display: block;
+    width: 100%;
+    margin-bottom: 15px;
+  }
+  .card-image-link img {
+    width: 100%;
+    max-width: 100%;
+    object-fit: contain;
+    transition: transform 0.3s ease;
+  }
+  .product-card:hover .card-image-link img {
+    animation: pulse 1s ease-in-out infinite;
+  }
+  .product-card h3 {
+    color: #fff;
+    font-size: 25px;
+    font-weight: 600;
+    margin-bottom: 15px;
+  }
+  .view-link {
+    color: #F1D68F;
+    text-decoration: none;
+    font-size: 16px;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    margin-top: auto;
+  }
+  .view-link .arrow {
+    transition: transform 0.2s ease;
+  }
+  .view-link:hover .arrow {
+    transform: translateX(3px);
+  }
+
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.03); }
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .product-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .hero-desc {
+      font-size: 16px;
+    }
+    .product-card h3 {
+      font-size: 18px;
+    }
+  }
+
+  /* Products section dark background */
+  .products-section {
+    background: #121212;
+  }
+</style>

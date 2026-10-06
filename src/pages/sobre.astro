@@ -1,0 +1,235 @@
+---
+/**
+ * About Page — /sobre/
+ */
+import Base from "@/layouts/Base.astro";
+---
+
+<Base title="Sobre Nos" description="Fundada em 1997, a Power Vox e uma empresa brasileira que se destaca na producao de alto-falantes de alta qualidade.">
+  <!-- ========== HERO SECTION ========== -->
+  <section class="sobre-hero">
+    <div class="sobre-hero-bg"></div>
+    <div class="sobre-hero-overlay"></div>
+    <div class="sobre-hero-container">
+      <div class="sobre-hero-text">
+        <h1>Sobre Nos - Power Vox</h1>
+        <p>
+          Fundada em 1997, a Power Vox e uma empresa brasileira que se destaca na
+          producao de alto-falantes de alta qualidade, tanto para uso automotivo
+          quanto profissional. Com sede na regiao de Goiania, somos uma marca que
+          se orgulha de seus principios de seguranca, preocupacao ambiental e
+          economia, sempre com um olhar voltado para a proxima geracao.
+        </p>
+        <div class="sobre-hero-buttons">
+          <a href="https://api.whatsapp.com/send?phone=556232827847" class="btn btn-primary" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.625.846 5.059 2.284 7.034L.789 23.492a.5.5 0 00.611.611l4.458-1.495A11.943 11.943 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-2.319 0-4.476-.673-6.303-1.834l-.44-.276-3.228 1.082 1.082-3.228-.276-.44A9.953 9.953 0 012 12C2 6.486 6.486 2 12 2s10 4.486 10 10-4.486 10-10 10z"/></svg>
+            62-3282-3053
+          </a>
+          <a href="/distribuidores/" class="btn btn-secondary">Distribuidores</a>
+        </div>
+      </div>
+      <div class="sobre-hero-image">
+        <img
+          src="/_emdash/api/media/file/01KNX7AABVXB89CMC3VBT2DW0D.jpeg"
+          alt="Power Vox Fabrica"
+          loading="lazy"
+        />
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== MISSION & VISION SECTION ========== -->
+  <section class="sobre-mv">
+    <div class="sobre-mv-container">
+      <div class="sobre-mv-card">
+        <h3>Nossa Visao</h3>
+        <p>
+          A nossa visao e ambiciosa e inspiradora: queremos ser reconhecidos como
+          uma das tres melhores empresas do Brasil no setor de alto-falantes
+          automotivos e profissionais.
+        </p>
+        <p>
+          Para alcancar esse objetivo, adotamos uma cultura de melhoria continua,
+          sempre buscando novas formas de aprimorar nossos produtos e servicos.
+        </p>
+        <p>
+          Convidamos voce a explorar mais sobre a Power Vox e descobrir como
+          nossos produtos podem transformar sua experiencia sonora. Seja
+          bem-vindo ao mundo da Power Vox, onde qualidade, inovacao e paixao pela
+          musica se encontram.
+        </p>
+      </div>
+      <div class="sobre-mv-card">
+        <h3>Nossa Missao</h3>
+        <p>
+          Na Power Vox, nossa missao e clara: criar produtos confiaveis e de
+          qualidade excepcional, que atendam e superem as expectativas de nossos
+          clientes.
+        </p>
+        <p>
+          Desde o inicio, a Power Vox e comprometida com qualidade e inovacao,
+          sempre dedicada a oferecer os melhores sistemas de som para atender as
+          necessidades dos clientes.
+        </p>
+        <p>
+          Seja para amantes de musica, profissionais de som ou entusiastas
+          automotivos, a Power Vox oferece solucoes que elevam a experiencia
+          auditiva a um novo patamar.
+        </p>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  /* ===== HERO ===== */
+  .sobre-hero {
+    position: relative;
+    padding: 100px 0;
+    overflow: hidden;
+  }
+
+  .sobre-hero-bg {
+    position: absolute;
+    inset: 0;
+    background-color: #000;
+    background-image: url('/_emdash/api/media/file/01KNX79Q9ZDVAJ25GJJFDJD49H.svg');
+    background-size: cover;
+    z-index: 0;
+  }
+
+  .sobre-hero-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, rgba(0, 0, 0, 0.95) 25%, rgba(0, 0, 0, 0.75) 100%);
+    z-index: 1;
+  }
+
+  .sobre-hero-container {
+    position: relative;
+    z-index: 2;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 15px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 50px;
+  }
+
+  .sobre-hero-text {
+    width: 65%;
+  }
+
+  .sobre-hero-text h1 {
+    color: #fff;
+    font-size: clamp(1.8rem, 3vw, 2.5rem);
+    font-weight: 700;
+    margin-bottom: 20px;
+  }
+
+  .sobre-hero-text p {
+    color: #fff;
+    font-weight: 300;
+    line-height: 1.7;
+    margin-bottom: 25px;
+  }
+
+  .sobre-hero-buttons {
+    display: flex;
+    flex-direction: row;
+    gap: 25px;
+    align-items: center;
+  }
+
+  .sobre-hero-image {
+    width: 35%;
+  }
+
+  .sobre-hero-image img {
+    width: 100%;
+    height: 400px;
+    object-fit: cover;
+    border-radius: 8px;
+  }
+
+  /* ===== MISSION & VISION ===== */
+  .sobre-mv {
+    background: #fff;
+    padding: 100px 0;
+  }
+
+  .sobre-mv-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 15px;
+    display: flex;
+    flex-direction: row;
+    gap: 50px;
+  }
+
+  .sobre-mv-card {
+    width: 50%;
+    padding: 35px;
+    border-radius: 8px;
+    border: 1px solid #000;
+    background: #fff;
+    box-shadow: 0 0 5px rgba(25, 25, 25, 0.12);
+    align-self: stretch;
+  }
+
+  .sobre-mv-card h3 {
+    font-weight: 400;
+    font-size: 1.5rem;
+    margin-bottom: 15px;
+    color: #000;
+  }
+
+  .sobre-mv-card p {
+    font-weight: 300;
+    color: #000;
+    line-height: 1.7;
+    margin-bottom: 15px;
+  }
+
+  .sobre-mv-card p:last-child {
+    margin-bottom: 0;
+  }
+
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 768px) {
+    .sobre-hero {
+      padding: 35px 0;
+    }
+
+    .sobre-hero-container {
+      flex-direction: column;
+      gap: 50px;
+    }
+
+    .sobre-hero-text {
+      width: 75%;
+    }
+
+    .sobre-hero-image {
+      width: 75%;
+    }
+
+    .sobre-hero-buttons {
+      gap: 15px;
+    }
+
+    .sobre-mv {
+      padding: 50px 0;
+    }
+
+    .sobre-mv-container {
+      flex-direction: column;
+      gap: 50px;
+    }
+
+    .sobre-mv-card {
+      width: 75%;
+    }
+  }
+</style>

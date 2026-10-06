@@ -1,448 +1,394 @@
 ---
-import { getEmDashCollection, getEntryTerms } from "emdash";
-import { Image } from "emdash/ui";
-import Base from "../layouts/Base.astro";
-import PostCard from "../components/PostCard.astro";
-import { getReadingTime } from "../utils/reading-time";
+/**
+ * Homepage — https://powervox.com.br/
+ * Matches Bricks Builder design:
+ * 1. Hero with video background
+ * 2. Benefits (3 icon boxes)
+ * 3. Products (tabbed carousel)
+ * 4. About section
+ * 5. Client gallery carousel
+ */
+import Base from "@/layouts/Base.astro";
+import { getEmDashCollection } from "@/utils/emdash";
+import ProductTabs from "@/components/ProductTabs.svelte";
+import ImageGallery from "@/components/ImageGallery.svelte";
 
-const { entries: posts, cacheHint } = await getEmDashCollection("posts");
+const EMDASH_BASE = "";
 
-Astro.cache.set(cacheHint);
+// Fetch products for carousel
+const { entries: midbassRaw } = await getEmDashCollection("midbass", { status: "published" });
+const { entries: subwooferRaw } = await getEmDashCollection("subwoofer", { status: "published" });
 
-const sortedPosts = posts.toSorted((a, b) => {
-	const dateA = a.data.publishedAt?.getTime() ?? 0;
-	const dateB = b.data.publishedAt?.getTime() ?? 0;
-	return dateB - dateA;
-});
+const midbassProducts = (midbassRaw || []).map((p: any) => ({
+  title: p.data?.title || "",
+  slug: p.slug,
+  basePath: "/produtos/mid-bass",
+  image: p.data?.featured_image?.meta?.storageKey
+    ? `${EMDASH_BASE}/_emdash/api/media/file/${p.data.featured_image.meta.storageKey}`
+    : p.data?.thumbnail_url || "",
+}));
 
-// Find the first post with a featured image for the hero
-const featuredPost = sortedPosts.find((p) => p.data.featured_image);
-const featuredIndex = featuredPost ? sortedPosts.indexOf(featuredPost) : -1;
+const subwooferProducts = (subwooferRaw || []).map((p: any) => ({
+  title: p.data?.title || "",
+  slug: p.slug,
+  basePath: "/produtos/subwoofer",
+  image: p.data?.featured_image?.meta?.storageKey
+    ? `${EMDASH_BASE}/_emdash/api/media/file/${p.data.featured_image.meta.storageKey}`
+    : p.data?.thumbnail_url || "",
+}));
 
-// Get remaining posts (exclude featured if found, limit to 6 for grid)
-const gridPosts = sortedPosts.filter((_, i) => i !== featuredIndex).slice(0, 6);
-
-// Total posts shown = featured (if any) + grid posts
-const totalShown = (featuredPost ? 1 : 0) + gridPosts.length;
-const hasMorePosts = sortedPosts.length > totalShown;
-
-// Fetch tags for featured post (bylines are already hydrated by getEmDashCollection)
-let featuredTags: Array<{ slug: string; label: string }> = [];
-const featuredBylines = featuredPost?.data.bylines ?? [];
-if (featuredPost) {
-	const tags = await getEntryTerms("posts", featuredPost.data.id, "tag");
-	featuredTags = tags.map((t) => ({ slug: t.slug, label: t.label }));
-}
-
-// Fetch tags for grid posts (bylines are already hydrated by getEmDashCollection)
-const gridPostsWithTags = await Promise.all(
-	gridPosts.map(async (post) => {
-		const tags = await getEntryTerms("posts", post.data.id, "tag");
-		const bylines = post.data.bylines ?? [];
-		return {
-			post,
-			tags: tags.map((t) => ({ slug: t.slug, label: t.label })),
-			bylines,
-		};
-	})
-);
-
-// Format date helper
-function formatDate(date: Date | null | undefined) {
-	if (!date) return null;
-	return date.toLocaleDateString("en-US", {
-		year: "numeric",
-		month: "long",
-		day: "numeric",
-	});
-}
+// Client gallery images
+const galleryImages = [
+  { src: "/_emdash/api/media/file/01KNX79W9521P7WYWAY9Q4YTZX.jpg", alt: "PowerVox Client" },
+  { src: "/_emdash/api/media/file/01KNX79VZKSDADYTP40MK6C8NR.jpg", alt: "PowerVox Client" },
+  { src: "/_emdash/api/media/file/01KNX79VNNJ64N46WE9EWZVXTA.jpg", alt: "PowerVox Client" },
+  { src: "/_emdash/api/media/file/01KNX79VBV7RHJZ3JDSBCSXGMT.jpg", alt: "PowerVox Client" },
+  { src: "/_emdash/api/media/file/01KNX79V213E41V5STC48GBF89.jpg", alt: "PowerVox Client" },
+  { src: "/_emdash/api/media/file/01KNX79TR398R76JVHMXZKP2T1.jpg", alt: "PowerVox Client" },
+  { src: "/_emdash/api/media/file/01KNX79SZMYZJE3E46RV5X10F1.jpg", alt: "PowerVox Client" },
+];
 ---
 
-<Base title="My Blog" description="Welcome to my blog">
-	{
-		posts.length === 0 ? (
-			<section class="empty-state">
-				<h2>No posts yet</h2>
-				<p>Create your first post in the admin panel.</p>
-				<a href="/_emdash/admin/content/posts/new" class="btn">
-					Create a post
-				</a>
-			</section>
-		) : (
-			<div class="home-content">
-				{/* Featured Post - Side by side */}
-				{featuredPost && (
-					<section class="featured-section">
-						<div class="featured-grid">
-							<a href={`/posts/${featuredPost.id}`} class="featured-image-link">
-								<div class="featured-image">
-									<Image image={featuredPost.data.featured_image} />
-								</div>
-							</a>
-							<div class="featured-content">
-								<div class="featured-meta">
-									{featuredBylines.length > 0 && (
-										<>
-											<div class="featured-bylines">
-												{featuredBylines.slice(0, 2).map((credit, index) => (
-													<>
-														{index > 0 && <span class="byline-sep">,</span>}
-														<span class="featured-byline">
-															{credit.byline.avatarMediaId && (
-																<img
-																	src={`/_emdash/api/media/file/${credit.byline.avatarMediaId}`}
-																	alt={credit.byline.displayName}
-																	class="featured-byline-avatar"
-																/>
-															)}
-															<span class="featured-byline-name">
-																{credit.byline.displayName}
-															</span>
-														</span>
-													</>
-												))}
-												{featuredBylines.length > 2 && (
-													<span class="byline-more">
-														+{featuredBylines.length - 2}
-													</span>
-												)}
-											</div>
-											<span class="meta-dot" />
-										</>
-									)}
-									{formatDate(featuredPost.data.publishedAt) && (
-										<time>{formatDate(featuredPost.data.publishedAt)}</time>
-									)}
-									<span class="meta-dot" />
-									<span>
-										{getReadingTime(featuredPost.data.content)} min read
-									</span>
-								</div>
-								<a
-									href={`/posts/${featuredPost.id}`}
-									class="featured-title-link"
-								>
-									<h1 class="featured-title">{featuredPost.data.title}</h1>
-								</a>
-								{featuredPost.data.excerpt && (
-									<p class="featured-excerpt">{featuredPost.data.excerpt}</p>
-								)}
-								{featuredTags.length > 0 && (
-									<div class="featured-tags">
-										{featuredTags.map((tag) => (
-											<a href={`/tag/${tag.slug}`} class="featured-tag">
-												{tag.label}
-											</a>
-										))}
-									</div>
-								)}
-							</div>
-						</div>
-					</section>
-				)}
+<Base title="Home">
+  <!-- ========== HERO SECTION ========== -->
+  <section class="hero-section">
+    <video autoplay muted loop playsinline class="hero-video">
+      <source src="/video/powervox-hero-bg.mp4" type="video/mp4" />
+    </video>
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <h1 class="hero-title">Qualidade que se ouve</h1>
+      <h4 class="hero-subtitle">Mais de 30 anos de excelencia</h4>
+    </div>
+  </section>
 
-				{/* Latest Posts */}
-				{gridPostsWithTags.length > 0 && (
-					<section class="posts-section">
-						<header class="section-header">
-							<h2 class="section-title">Latest</h2>
-							{hasMorePosts && (
-								<a href="/posts" class="section-link">
-									View all
-								</a>
-							)}
-						</header>
-						<div class="posts-grid">
-							{gridPostsWithTags.map(({ post, tags, bylines }) => (
-								<PostCard
-									title={post.data.title ?? "Untitled"}
-									excerpt={post.data.excerpt}
-									featuredImage={post.data.featured_image}
-									href={`/posts/${post.id}`}
-									date={post.data.publishedAt ?? undefined}
-									readingTime={getReadingTime(post.data.content)}
-									tags={tags}
-									bylines={bylines}
-								/>
-							))}
-						</div>
-					</section>
-				)}
-			</div>
-		)
-	}
+  <!-- ========== BENEFITS SECTION ========== -->
+  <section class="benefits-section">
+    <div class="benefits-container">
+      <div class="benefit-item fade-in">
+        <div class="benefit-icon">
+          <svg viewBox="0 0 24 24" width="50" height="50" fill="none" stroke="currentColor" stroke-width="1.5">
+            <circle cx="12" cy="8" r="5" />
+            <path d="M12 13v3M8 22h8M7 16l-2 6M17 16l2 6" />
+            <path d="M9 6.5l1.5 2L15 5" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </div>
+        <div class="benefit-text">
+          <h3>QUALIDADE</h3>
+          <p>Trabalhamos com materia prima selecionada.</p>
+        </div>
+      </div>
+
+      <div class="benefit-item fade-in fade-in-delay-1">
+        <div class="benefit-icon">
+          <svg viewBox="0 0 24 24" width="50" height="50" fill="none" stroke="currentColor" stroke-width="1.5">
+            <rect x="2" y="3" width="20" height="14" rx="2" />
+            <path d="M8 21h8M12 17v4" />
+            <path d="M7 8h4M7 11h6" />
+          </svg>
+        </div>
+        <div class="benefit-text">
+          <h3>DESIGN</h3>
+          <p>Trata de melhorias no processo de producao de nosso produtos.</p>
+        </div>
+      </div>
+
+      <div class="benefit-item fade-in fade-in-delay-2">
+        <div class="benefit-icon">
+          <svg viewBox="0 0 24 24" width="50" height="50" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8v.5z" />
+          </svg>
+        </div>
+        <div class="benefit-text">
+          <h3>ATENDIMENTO</h3>
+          <p>Entendemos que a parte mais importante de qualquer processo sao as pessoas.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== PRODUCTS SECTION ========== -->
+  <section class="products-section">
+    <div class="products-bg"></div>
+    <div class="products-overlay">
+      <div class="products-container">
+        <ProductTabs
+          client:load
+          midbassProducts={midbassProducts}
+          subwooferProducts={subwooferProducts}
+        />
+        <div class="products-cta">
+          <a href="/produtos/" class="btn btn-secondary">More Products</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== ABOUT SECTION ========== -->
+  <section class="about-section">
+    <div class="about-container">
+      <div class="about-text">
+        <h2>Mais de 30 anos de excelencia</h2>
+        <p>
+          Localizada no Brasil, nossa fabrica e uma pioneira unica na industria de
+          alto-falantes automotivos. Nos orgulhamos de ser uma das poucas instalacoes
+          no mundo que fabrica todos os componentes dos nossos alto-falantes internamente.
+        </p>
+        <a href="/sobre/" class="btn btn-primary">Sobre Nos</a>
+      </div>
+      <div class="about-image">
+        <img
+          src="/_emdash/api/media/file/01KNX79TDWY4MHH04PZ75NFFGE.jpg"
+          alt="Fabrica PowerVox"
+          loading="lazy"
+        />
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== CLIENT GALLERY ========== -->
+  <section class="gallery-section">
+    <ImageGallery client:visible images={galleryImages} />
+  </section>
 </Base>
 
 <style>
-	.home-content {
-		max-width: var(--wide-width);
-		margin: 0 auto;
-		padding: var(--spacing-16) var(--spacing-6);
-	}
+  /* ===== HERO ===== */
+  .hero-section {
+    position: relative;
+    height: 800px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 
-	/* Featured Section - Side by side */
-	.featured-section {
-		margin-bottom: var(--spacing-16);
-	}
+  .hero-video {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    min-width: 100%;
+    min-height: 100%;
+    transform: translate(-50%, -50%);
+    object-fit: cover;
+    z-index: 0;
+  }
 
-	.featured-grid {
-		display: grid;
-		grid-template-columns: repeat(3, 1fr);
-		gap: var(--spacing-8);
-		align-items: center;
-	}
+  .hero-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 1;
+  }
 
-	.featured-image-link {
-		grid-column: 1 / 3;
-		display: block;
-		/* Extend to viewport edge, but cap at -6rem minimum extension */
-		margin-left: min(
-			-6rem,
-			calc(-1 * (var(--spacing-6) + (100vw - var(--wide-width)) / 2))
-		);
-	}
+  .hero-content {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    padding: 35px;
+  }
 
-	.featured-image {
-		overflow: hidden;
-		border-radius: 0 var(--radius-lg) var(--radius-lg) 0;
-		background: var(--color-surface);
-	}
+  .hero-title {
+    color: #fff;
+    text-transform: uppercase;
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 700;
+    margin-bottom: 0;
+    line-height: 1.1;
+  }
 
-	.featured-image img {
-		width: 100%;
-		height: auto;
-		aspect-ratio: 4 / 3;
-		object-fit: cover;
-		transition: transform 0.4s ease;
-	}
+  .hero-subtitle {
+    color: #fff;
+    font-weight: 300;
+    font-size: clamp(1rem, 2.5vw, 1.5rem);
+    margin-bottom: 35px;
+  }
 
-	.featured-image-link:hover .featured-image img,
-	.featured-grid:has(.featured-title-link:hover) .featured-image img {
-		transform: scale(1.02);
-	}
+  /* ===== BENEFITS ===== */
+  .benefits-section {
+    background: #fff;
+    padding: 0;
+  }
 
-	.featured-content {
-		display: flex;
-		flex-direction: column;
-		gap: var(--spacing-4);
-	}
+  .benefits-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    gap: 50px;
+    padding: 35px 15px;
+  }
 
-	.featured-meta {
-		display: flex;
-		align-items: center;
-		flex-wrap: wrap;
-		column-gap: var(--spacing-3);
-		row-gap: var(--spacing-1);
-		font-size: var(--font-size-sm);
-		color: var(--color-muted);
-	}
+  .benefit-item {
+    flex: 1;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 25px;
+  }
 
-	.meta-dot {
-		width: 3px;
-		height: 3px;
-		border-radius: 50%;
-		background: var(--color-muted);
-	}
+  .benefit-icon {
+    flex-shrink: 0;
+    color: #000;
+  }
 
-	/* Featured bylines */
-	.featured-bylines {
-		display: flex;
-		align-items: center;
-		gap: 2px;
-	}
+  .benefit-text h3 {
+    font-size: 30px;
+    font-weight: 700;
+    color: #000;
+    margin-bottom: 5px;
+    font-family: 'Readex Pro', system-ui, sans-serif;
+  }
 
-	.featured-byline {
-		display: inline-flex;
-		align-items: center;
-		gap: var(--spacing-2);
-	}
+  .benefit-text p {
+    font-size: 15px;
+    color: #333;
+    line-height: 1.5;
+  }
 
-	.featured-byline-avatar {
-		width: var(--avatar-size-md);
-		height: var(--avatar-size-md);
-		border-radius: 50%;
-		object-fit: cover;
-	}
+  /* ===== PRODUCTS ===== */
+  .products-section {
+    position: relative;
+    overflow: hidden;
+  }
 
-	.featured-byline-name {
-		font-weight: 500;
-		color: var(--color-text-secondary);
-	}
+  .products-bg {
+    position: absolute;
+    inset: 0;
+    background-color: #000;
+    background-image: url('/_emdash/api/media/file/01KNX7A0GJYP2WDP9MAYX3RSDP.svg');
+    background-size: cover;
+    z-index: 0;
+  }
 
-	.byline-sep {
-		color: var(--color-muted);
-		margin-right: 2px;
-	}
+  .products-overlay {
+    position: relative;
+    z-index: 1;
+    background: rgba(0, 0, 0, 0.83);
+    padding: 60px 15px;
+  }
 
-	.byline-more {
-		font-size: var(--font-size-xs);
-		color: var(--color-muted);
-		margin-left: 2px;
-	}
+  .products-container {
+    max-width: 80%;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
 
-	.featured-title-link {
-		text-decoration: none;
-		color: inherit;
-	}
+  .products-cta {
+    margin-top: 20px;
+  }
 
-	.featured-title {
-		font-size: clamp(var(--font-size-2xl), 4vw, var(--font-size-4xl));
-		font-weight: 700;
-		line-height: var(--leading-tight);
-		letter-spacing: var(--tracking-tight);
-		transition: color var(--transition-fast);
-	}
+  /* ===== ABOUT ===== */
+  .about-section {
+    background: #fff;
+    padding: 60px 15px;
+  }
 
-	.featured-title-link:hover .featured-title,
-	.featured-grid:has(.featured-image-link:hover) .featured-title {
-		color: var(--color-accent);
-	}
+  .about-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    gap: 50px;
+    align-items: stretch;
+  }
 
-	.featured-excerpt {
-		font-size: var(--font-size-lg);
-		line-height: var(--leading-relaxed);
-		color: var(--color-text-secondary);
-	}
+  .about-text {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    text-align: left;
+  }
 
-	.featured-tags {
-		display: flex;
-		flex-wrap: wrap;
-		gap: var(--spacing-2);
-		margin-top: var(--spacing-2);
-	}
+  .about-text h2 {
+    font-size: clamp(1.8rem, 3vw, 2.5rem);
+    color: #000;
+    line-height: 1;
+    margin-bottom: 15px;
+  }
 
-	.featured-tag {
-		display: inline-block;
-		padding: var(--spacing-1) var(--spacing-3);
-		font-size: var(--font-size-sm);
-		color: var(--color-text-secondary);
-		background: var(--color-surface);
-		border-radius: var(--radius);
-		text-decoration: none;
-		transition:
-			color var(--transition-fast),
-			background var(--transition-fast);
-	}
+  .about-text p {
+    text-align: left;
+    line-height: 1.7;
+    margin-bottom: 25px;
+    color: #333;
+  }
 
-	.featured-tag:hover {
-		color: var(--color-text);
-		background: var(--color-border);
-	}
+  .about-image {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 
-	/* Section header */
-	.section-header {
-		display: flex;
-		justify-content: space-between;
-		align-items: baseline;
-		margin-bottom: var(--spacing-8);
-		padding-bottom: var(--spacing-4);
-		border-bottom: 1px solid var(--color-border-subtle);
-	}
+  .about-image img {
+    width: 100%;
+    height: 500px;
+    object-fit: cover;
+    border-radius: 10px;
+  }
 
-	.section-title {
-		font-size: var(--font-size-sm);
-		font-weight: 500;
-		text-transform: uppercase;
-		letter-spacing: var(--tracking-wider);
-		color: var(--color-muted);
-	}
+  /* ===== GALLERY ===== */
+  .gallery-section {
+    background: #000;
+    padding: 0;
+  }
 
-	.section-link {
-		font-size: var(--font-size-sm);
-		color: var(--color-accent);
-		text-decoration: none;
-		transition: color var(--transition-fast);
-	}
+  /* ===== RESPONSIVE ===== */
+  @media (max-width: 1024px) {
+    .products-container {
+      max-width: 95%;
+    }
+  }
 
-	.section-link:hover {
-		color: var(--color-accent-hover);
-	}
+  @media (max-width: 768px) {
+    .hero-section {
+      height: 50vh;
+    }
 
-	/* Posts Grid */
-	.posts-section {
-	}
+    .hero-content {
+      align-self: flex-start;
+    }
 
-	.posts-grid {
-		display: grid;
-		grid-template-columns: repeat(3, 1fr);
-		gap: var(--spacing-12) var(--spacing-8);
-	}
+    .benefits-container {
+      flex-direction: column;
+      gap: 15px;
+      padding: 35px;
+    }
 
-	/* Empty State */
-	.empty-state {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		gap: var(--spacing-3);
-		text-align: center;
-		padding: var(--spacing-20) var(--spacing-6);
-		max-width: 400px;
-		margin: 0 auto;
-	}
+    .benefit-item {
+      flex-direction: row;
+    }
 
-	.empty-state h2 {
-		font-size: var(--font-size-2xl);
-		font-weight: 600;
-	}
+    .benefit-text h3 {
+      font-size: 22px;
+    }
 
-	.empty-state p {
-		color: var(--color-muted);
-	}
+    .products-overlay {
+      padding: 35px 15px;
+    }
 
-	.btn {
-		display: inline-block;
-		margin-top: var(--spacing-4);
-		padding: var(--spacing-3) var(--spacing-6);
-		background: var(--color-accent);
-		color: var(--color-on-accent);
-		text-decoration: none;
-		border-radius: var(--radius);
-		font-size: var(--font-size-sm);
-		font-weight: 500;
-		transition: background var(--transition-fast);
-	}
+    .products-container {
+      max-width: 100%;
+    }
 
-	.btn:hover {
-		background: var(--color-accent-hover);
-	}
+    .products-cta {
+      margin-top: 0;
+    }
 
-	/* Responsive */
-	@media (max-width: 900px) {
-		.home-content {
-			padding: var(--spacing-6) var(--spacing-4) var(--spacing-12);
-		}
+    .about-container {
+      flex-direction: column;
+      gap: 50px;
+    }
 
-		.featured-image-link {
-			margin-left: 0;
-		}
+    .about-section {
+      padding: 35px;
+    }
 
-		.featured-grid {
-			grid-template-columns: 1fr;
-			gap: var(--spacing-6);
-		}
-
-		.featured-image {
-			border-radius: var(--radius-lg);
-		}
-
-		.featured-image img {
-			aspect-ratio: 16 / 9;
-		}
-
-		.posts-grid {
-			grid-template-columns: repeat(2, 1fr);
-			gap: var(--spacing-8) var(--spacing-6);
-		}
-	}
-
-	@media (max-width: 600px) {
-		.featured-title {
-			font-size: var(--font-size-2xl);
-		}
-
-		.posts-grid {
-			grid-template-columns: 1fr;
-			gap: var(--spacing-8);
-		}
-	}
+    .about-image img {
+      height: 300px;
+    }
+  }
 </style>

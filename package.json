@@ -1,29 +1,35 @@
 {
-	"name": "powervox",
-	"version": "0.0.1",
-	"private": true,
-	"type": "module",
-	"scripts": {
-		"dev": "astro dev",
-		"build": "astro build",
-		"preview": "astro preview",
-		"deploy": "wrangler deploy",
-		"typecheck": "astro check" 
-	},
-	"dependencies": {
-		"@astrojs/cloudflare": "^13.1.6",
-		"@astrojs/react": "^5.0.0",
-    "@emdash-cms/cloudflare": "^0.1.0",
-    "@emdash-cms/plugin-forms": "^0.1.0",
-    "@emdash-cms/plugin-webhook-notifier": "^0.1.0",
-		"astro": "^6.1.2",
-    "emdash": "^0.1.0",
-		"react": "^19.2.4",
-		"react-dom": "^19.2.4"
-	},
-	"devDependencies": {
-		"@astrojs/check": "^0.9.7",
-		"@cloudflare/workers-types": "^4.20260401.1",
-		"wrangler": "^4.79.0"
-	}
+  "name": "powervox",
+  "version": "1.0.0",
+  "description": "Powervox - Alto Falantes Automotivos",
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "types": "npx emdash types",
+    "postinstall": "patch-package"
+  },
+  "emdash": {
+    "label": "Powervox Theme",
+    "description": "Custom Powervox automotive speakers theme",
+    "seed": ".emdash/seed.json"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@astrojs/check": "^0.9.8",
+    "@astrojs/cloudflare": "^13.1.8",
+    "@astrojs/react": "^5.0.3",
+    "@astrojs/svelte": "^8.0.4",
+    "@emdash-cms/cloudflare": "^0.1.1",
+    "astro": "^6.1.5",
+    "emdash": "^0.1.1",
+    "patch-package": "^8.0.1",
+    "react": "^19.2.5",
+    "react-dom": "^19.2.5",
+    "svelte": "^5.55.3",
+    "typescript": "^5.9.3"
+  }
 }
