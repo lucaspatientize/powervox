@@ -7,3 +7,4 @@ dist
 .dev.vars*
 .cursor
 backup_*.zip
+backups/

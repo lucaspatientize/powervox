@@ -1,14 +1,10 @@
-import { fileURLToPath } from "node:url";
 import { defineConfig } from "astro/config";
 import emdash from "emdash/astro";
 import { d1, r2 } from "@emdash-cms/cloudflare";
+import { cloudflareEmail } from "@emdash-cms/cloudflare/plugins";
 import svelte from "@astrojs/svelte";
 import react from "@astrojs/react";
 import cloudflare from "@astrojs/cloudflare";
-
-const cloudflareEmailEntrypoint = fileURLToPath(
-  new URL("./src/plugins/cloudflare-email.ts", import.meta.url),
-).replaceAll("\\", "/");
 
 export default defineConfig({
   output: "server",
@@ -24,16 +20,9 @@ export default defineConfig({
       database: d1({ binding: "DB" }),
       storage: r2({ binding: "MEDIA" }),
       plugins: [
-        {
-          id: "cloudflare-email",
-          version: "1.0.0",
-          entrypoint: cloudflareEmailEntrypoint,
-          format: "native",
-          options: {
-            from: { email: "noreply@cms.powervox.com.br", name: "PowerVox" },
-          },
-          capabilities: ["email:provide"],
-        },
+        cloudflareEmail({
+          from: { email: "noreply@cms.powervox.com.br", name: "PowerVox" },
+        }),
       ],
     }),
   ],

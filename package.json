@@ -8,8 +8,7 @@
     "build": "astro build",
     "preview": "astro preview",
     "deploy": "wrangler deploy",
-    "types": "npx emdash types",
-    "postinstall": "patch-package"
+    "types": "npx emdash types"
   },
   "emdash": {
     "label": "Powervox Theme",
@@ -24,13 +23,13 @@
     "@astrojs/cloudflare": "^13.1.8",
     "@astrojs/react": "^5.0.3",
     "@astrojs/svelte": "^8.0.4",
-    "@emdash-cms/cloudflare": "^0.1.1",
+    "@emdash-cms/cloudflare": "^1.1.0",
     "astro": "^6.1.5",
-    "emdash": "^0.1.1",
-    "patch-package": "^8.0.1",
+    "emdash": "^1.1.0",
     "react": "^19.2.5",
     "react-dom": "^19.2.5",
     "svelte": "^5.55.3",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "wrangler": "^4.147.0"
   }
 }
