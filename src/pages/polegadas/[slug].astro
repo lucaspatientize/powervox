@@ -1,0 +1,73 @@
+---
+/**
+ * Polegadas filter page — /polegadas/[slug]/
+ */
+import Base from "@/layouts/Base.astro";
+import { parsePolegadasSlug, getMidBassProducts, getSubwooferProducts } from "@/utils/emdash";
+
+const EMDASH_BASE = "";
+const { slug } = Astro.params;
+if (!slug) return Astro.redirect("/produtos/");
+
+const { size, type } = parsePolegadasSlug(slug);
+if (!size || !type) return Astro.redirect("/produtos/");
+
+const typeLabel = type === "midbass" ? "Mid Bass" : "Subwoofer";
+const products = type === "midbass"
+  ? await getMidBassProducts(size + '"')
+  : await getSubwooferProducts(size + '"');
+
+const productBasePath = type === "midbass" ? "/produtos/mid-bass" : "/produtos/subwoofer";
+
+function getImage(p: any) {
+  if (p.data?.featured_image?.meta?.storageKey)
+    return `${EMDASH_BASE}/_emdash/api/media/file/${p.data.featured_image.meta.storageKey}`;
+  return p.data?.thumbnail_url || "";
+}
+---
+
+<Base title={`${size}" ${typeLabel}`}>
+  <section class="page-header">
+    <div class="container">
+      <h1>{size}" {typeLabel}</h1>
+      <p>{products.length} produtos encontrados</p>
+    </div>
+  </section>
+
+  <section class="products-listing">
+    <div class="container">
+      <div class="product-grid">
+        {products.map((product: any) => (
+          <a href={`${productBasePath}/${product.slug}/`} class="product-card">
+            {getImage(product) && (
+              <div class="card-image">
+                <img src={getImage(product)} alt={product.data?.title} loading="lazy" />
+              </div>
+            )}
+            <div class="card-info">
+              <h3>{product.data?.title}</h3>
+            </div>
+          </a>
+        ))}
+      </div>
+      {products.length === 0 && (
+        <p class="empty">Nenhum produto encontrado para {size}" {typeLabel}.</p>
+      )}
+    </div>
+  </section>
+</Base>
+
+<style>
+  .page-header { background: #000; color: #fff; padding: 60px 0; }
+  .page-header h1 { font-size: 2.5rem; }
+  .page-header p { color: #ccc; margin-top: 5px; }
+  .products-listing { padding: 40px 0; }
+  .product-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; }
+  .product-card { border: 1px solid #f0f0f0; border-radius: 8px; overflow: hidden; text-decoration: none; color: #000; transition: transform 0.2s, box-shadow 0.2s; background: #fff; }
+  .product-card:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(0,0,0,0.12); }
+  .card-image { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; padding: 15px; }
+  .card-image img { max-width: 100%; max-height: 100%; object-fit: contain; }
+  .card-info { padding: 12px 15px; background: #f9f9f9; text-align: center; }
+  .card-info h3 { font-size: 0.9rem; font-weight: 500; }
+  .empty { text-align: center; color: #999; padding: 60px; font-size: 1.1rem; }
+</style>

@@ -1,0 +1,86 @@
+{
+  "settings": {
+    "title": "Powervox",
+    "tagline": "Alto Falantes Automotivos",
+    "postsPerPage": 12
+  },
+  "collections": {
+    "posts": {
+      "label": "Posts",
+      "slug": "posts",
+      "fields": {
+        "title": { "type": "string", "required": true },
+        "featured_image": { "type": "image" },
+        "content": { "type": "portableText" },
+        "excerpt": { "type": "text" }
+      }
+    },
+    "pages": {
+      "label": "Pages",
+      "slug": "pages",
+      "fields": {
+        "title": { "type": "string", "required": true },
+        "featured_image": { "type": "image" },
+        "content": { "type": "portableText" },
+        "excerpt": { "type": "text" }
+      }
+    },
+    "midbass": {
+      "label": "Mid Bass",
+      "slug": "midbass",
+      "fields": {
+        "title": { "type": "string", "required": true },
+        "featured_image": { "type": "image" },
+        "thumbnail_url": { "type": "string" },
+        "content": { "type": "portableText" },
+        "polegadas": { "type": "string" },
+        "specifications_html": { "type": "text" },
+        "parameters_html": { "type": "text" }
+      }
+    },
+    "subwoofer": {
+      "label": "Subwoofer",
+      "slug": "subwoofer",
+      "fields": {
+        "title": { "type": "string", "required": true },
+        "featured_image": { "type": "image" },
+        "thumbnail_url": { "type": "string" },
+        "content": { "type": "portableText" },
+        "polegadas": { "type": "string" },
+        "specifications_html": { "type": "text" },
+        "parameters_html": { "type": "text" },
+        "caixa_redondo_fechada": { "type": "text" },
+        "caixa_retangular_fechada": { "type": "text" },
+        "caixa_redondo_aberto": { "type": "text" },
+        "caixa_retangular_aberto": { "type": "text" }
+      }
+    }
+  },
+  "taxonomies": {
+    "polegadas": {
+      "label": "Polegadas",
+      "slug": "polegadas",
+      "collections": ["midbass", "subwoofer"],
+      "terms": [
+        { "label": "5\"", "slug": "5-midbass" },
+        { "label": "6\"", "slug": "6-midbass" },
+        { "label": "8\"", "slug": "8-subwoofer" },
+        { "label": "10\"", "slug": "10-subwoofer" },
+        { "label": "12\"", "slug": "12-subwoofer" },
+        { "label": "15\"", "slug": "15-subwoofer" }
+      ]
+    }
+  },
+  "menus": {
+    "primary": {
+      "label": "Primary Navigation",
+      "items": [
+        { "label": "Home", "url": "/" },
+        { "label": "Produtos", "url": "/produtos/" },
+        { "label": "Sobre", "url": "/sobre/" },
+        { "label": "Distribuidores", "url": "/distribuidores/" },
+        { "label": "Contato", "url": "/contato/" }
+      ]
+    }
+  }
+}
